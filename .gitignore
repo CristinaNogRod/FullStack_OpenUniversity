@@ -16,4 +16,4 @@ node_modules/
 /build
 
 # solution files
-.txt
+*.txt
