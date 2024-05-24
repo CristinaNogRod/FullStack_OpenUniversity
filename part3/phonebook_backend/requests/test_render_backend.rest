@@ -1,0 +1,4 @@
+GET https://fullstack-openuniversity.onrender.com/api/persons
+
+###
+GET https://fullstack-openuniversity.onrender.com/info
