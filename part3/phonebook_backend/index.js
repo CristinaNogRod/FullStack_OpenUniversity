@@ -1,29 +1,10 @@
 const express = require('express')
-
+require('dotenv').config()
 const app = express()
 
-let persons = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
+const Persons = require('./models/persons')
+
+let persons = []
 
 app.use(express.static('dist'))
 
@@ -41,13 +22,19 @@ app.use(cors())
 app.use(express.json())
 app.use(requestLogger)
 
-const morgan = require('morgan')
-//app.use(morgan('tiny'))
-morgan.token('req-body', (req) => JSON.stringify(req.body))
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body'))
+// const morgan = require('morgan')
+// //app.use(morgan('tiny'))
+// morgan.token('req-body', (req) => JSON.stringify(req.body))
+// app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body'))
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Persons.find({}).then(persons => {
+        response.json(persons)
+    })
 })
 
 app.get('/info', (request, response) => {
@@ -110,7 +97,9 @@ app.post('/api/persons', (request, response) => {
 })
 
 
-const PORT = process.env.PORT || 3001
+app.use(unknownEndpoint)
+
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
