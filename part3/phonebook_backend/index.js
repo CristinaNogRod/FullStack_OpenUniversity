@@ -2,7 +2,7 @@ const express = require('express')
 require('dotenv').config()
 const app = express()
 
-const Persons = require('./models/persons')
+const Person = require('./models/person')
 
 let persons = []
 
@@ -32,7 +32,7 @@ const unknownEndpoint = (request, response) => {
 }
 
 app.get('/api/persons', (request, response) => {
-    Persons.find({}).then(persons => {
+    Person.find({}).then(persons => {
         response.json(persons)
     })
 })
