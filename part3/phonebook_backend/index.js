@@ -62,7 +62,10 @@ app.delete('/api/persons/:id', (request, response) => {
         .then(result => {
             response.status(204).end()
         })
-        .catch(error => next(error))
+        .catch(error => {
+            console.log("can't get id")
+            error
+        })
 })
 
 const generateId = () => {
