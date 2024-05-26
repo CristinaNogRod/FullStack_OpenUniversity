@@ -54,7 +54,10 @@ app.get('/api/persons/:id', (request, response) => {
             response.status(404).end()
         }
     })
-    .catch(error => next(error))
+    .catch(error => {
+        console.log("can't get id")
+        error
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
