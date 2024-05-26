@@ -2,8 +2,6 @@ const express = require('express')
 require('dotenv').config()
 const app = express()
 
-console.log('MongoDB URI:', process.env.MONGODB_URI); 
-
 const Person = require('./models/person')
 
 let persons = []
@@ -39,24 +37,20 @@ app.get('/api/persons', (request, response) => {
     })
 })
 
-app.get('/info', (request, response) => {
-    const date = new Date()
-    const info = `
-        <p>Phonebook has info for ${persons.length} people</p>
-        <p>${date}</p>
-    `
-    response.send(info)
-})
+// app.get('/info', (request, response) => {
+//     const date = new Date()
+//     const info = `
+//         <p>Phonebook has info for ${persons.length} people</p>
+//         <p>${date}</p>
+//     `
+//     response.send(info)
+// })
 
 app.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
-    const person = persons.find(person => person.id === id)
-
-    if (person) {
+    Person.findById(id).then(person =>
         response.json(person)
-    } else {
-        response.status(404).end()
-    }
+    )
 })
 
 app.delete('/api/persons/:id', (request, response) => {
