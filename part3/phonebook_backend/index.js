@@ -47,14 +47,13 @@ app.get('/api/persons', (request, response) => {
 // })
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    Person.findById(id).then(person =>
+    Person.findById(request.params.id).then(person =>
         response.json(person)
     )
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
+    const id = request.params.id
     persons = persons.filter(person => person.id !== id)
   
     response.status(204).end()
