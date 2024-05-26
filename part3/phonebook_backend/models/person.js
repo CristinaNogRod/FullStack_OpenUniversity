@@ -1,8 +1,6 @@
 const mongoose = require('mongoose')
-require('dotenv').config()
-console.log('MongoDB URI:', process.env.MONGODB_URI); 
 
-
+console.log("in person.js model")
 mongoose.set('strictQuery',false)
 
 const url = process.env.MONGODB_URI

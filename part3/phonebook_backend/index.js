@@ -2,6 +2,8 @@ const express = require('express')
 require('dotenv').config()
 const app = express()
 
+console.log('MongoDB URI:', process.env.MONGODB_URI); 
+
 const Person = require('./models/person')
 
 let persons = []
