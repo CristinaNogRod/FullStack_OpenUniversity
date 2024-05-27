@@ -47,12 +47,14 @@ app.get('/api/persons', (request, response, next) => {
 })
 
 app.get('/info', (request, response) => {
-    const date = new Date()
-    const info = `
-        <p>Phonebook has info for ${Person.length} people</p>
-        <p>${date}</p>
-    `
-    response.send(info)
+    Person.countDocuments({}).then(count => {
+        const date = new Date()
+        const info = `
+            <p>Phonebook has info for ${count} people</p>
+            <p>${date}</p>
+        `
+        response.send(info)
+    })
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -91,11 +93,11 @@ app.post('/api/persons', (request, response) => {
     //     })
     // }
 
-    const person = {
+    const person = new Person ({
         // id: generateId(),
         name: body.name,
         number: body.number,
-    }
+    })
 
     person.save().then(savedPerson => {
         console.log("saving person")
@@ -110,7 +112,7 @@ app.put('/api/persons/:id', (request, response, next) => {
         number: body.number,
     }
 
-    Person.findByIdAndUpdate(request.params.id, person, {new: true})
+    Person.findByIdAndUpdate(request.params.id, person, {new: true, runValidators: true, context: 'query'})
       .then(updatedPerson => {
         response.json(updatedPerson)
       })
@@ -121,7 +123,7 @@ app.put('/api/persons/:id', (request, response, next) => {
 app.use(unknownEndpoint)
 app.use(errorHandler);
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
