@@ -72,7 +72,13 @@ app.get('/api/persons/:id', (request, response, next) => {
 app.delete('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndDelete(request.params.id)
         .then(result => {
-            response.status(204).end()
+            if (result) {
+                console.log(`Deleted person with id ${request.params.id}`)
+                response.status(204).end()
+            } else {
+                console.log(`Person with id ${request.params.id} not found`)
+                response.status(404).send({ error: 'Person not found' })
+            }
         })
         .catch(error => next(error))
 })
