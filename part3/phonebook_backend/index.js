@@ -52,7 +52,7 @@ app.get('/info', (request, response) => {
         <p>Phonebook has info for ${Person.length} people</p>
         <p>${date}</p>
     `
-    response.json(info)
+    response.send(info)
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
