@@ -18,8 +18,10 @@ const errorHandler = (error, request, response, next) => {
     console.error(error.message)
     if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+      return response.status(400).json({ error: error.message })
     }
-    next(error);
+    next(error)
 }
 
 const cors = require('cors')
@@ -93,16 +95,9 @@ app.post('/api/persons', (request, response) => {
     
     if (!body.name || !body.number) {
         return response.status(400).json({ error: 'name or number missing' })
-      }
+    }
 
-    // if (persons.find(person => person.name === body.name)) {
-    //     return response.status(400).json({ 
-    //         error: 'name must be unique' 
-    //     })
-    // }
-
-    const person = new Person ({
-        // id: generateId(),
+    const person = new Person({
         name: body.name,
         number: body.number,
     })
