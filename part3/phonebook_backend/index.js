@@ -79,7 +79,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 //     return Math.floor(Math.random() * 10000)
 // }
 
-app.post('/api/persons', (request, response, next) => {
+app.post('/api/persons', (request, response) => {
     const body = request.body
     if (body.content === undefined) {
         return response.status(400).json({error: 'name or number missing'})
@@ -98,6 +98,7 @@ app.post('/api/persons', (request, response, next) => {
     }
 
     person.save().then(savedPerson => {
+        console.log("saving person")
         response.json(savedPerson)
     })
 })
