@@ -99,11 +99,11 @@ app.post('/api/persons', (request, response) => {
     //     })
     // }
 
-    const person = new Person ({
+    const person = {
         // id: generateId(),
         name: body.name,
         number: body.number,
-    })
+    }
 
     person.save().then(savedPerson => {
         console.log("saving person")
