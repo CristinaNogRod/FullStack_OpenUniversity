@@ -121,7 +121,7 @@ app.put('/api/persons/:id', (request, response, next) => {
 
 // remaining middleware
 app.use(unknownEndpoint)
-app.use(errorHandler);
+app.use(errorHandler)
 
 const PORT = process.env.PORT 
 app.listen(PORT, () => {
