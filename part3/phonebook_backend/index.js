@@ -89,9 +89,11 @@ app.delete('/api/persons/:id', (request, response, next) => {
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
-    if (body.content === undefined) {
-        return response.status(400).json({error: 'name or number missing'})
-    }
+    console.log('Request Body:', body)
+    
+    if (!body.name || !body.number) {
+        return response.status(400).json({ error: 'name or number missing' })
+      }
 
     // if (persons.find(person => person.name === body.name)) {
     //     return response.status(400).json({ 
@@ -99,11 +101,11 @@ app.post('/api/persons', (request, response) => {
     //     })
     // }
 
-    const person = {
+    const person = new Person ({
         // id: generateId(),
         name: body.name,
         number: body.number,
-    }
+    })
 
     person.save().then(savedPerson => {
         console.log("saving person")
