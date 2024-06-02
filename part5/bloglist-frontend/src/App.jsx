@@ -1,6 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+
 import Blog from './components/Blog'
 import Login from './components/Login'
+import BlogForm from './components/BlogForm'
+import Notification from './components/Notification'
+import Togglable from './components/Togglable'
+
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -9,6 +14,9 @@ const App = () => {
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const [notification, setNotification] = useState({ message: null, type: null })
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -42,10 +50,10 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      // setErrorMessage('Wrong credentials')
-      // setTimeout(() => {
-      //   setErrorMessage(null)
-      // }, 5000)
+      setNotification({message: 'Wrong credentials', type: "error"})
+      setTimeout(() => {
+        setNotification({ message: null, type: null })
+      }, 5000)
     }
   }
 
@@ -56,37 +64,85 @@ const App = () => {
       window.localStorage.removeItem('loggedBlogAppUser')
       setUser(null)
     } catch (exception) {
-      // setErrorMessage('Failed to Logout')
-      // setTimeout(() => {
-      //   setErrorMessage(null)
-      // }, 5000)
+      setNotification({message:'Failed to Logout', type:"error"})
+      setTimeout(() => {
+        setNotification({ message: null, type: null })
+      }, 5000)
     }
   }
 
-  const loginForm = () => (
-    <Login 
-        handleLogin={handleLogin} 
-        setUsername={setUsername} 
-        setPassword={setPassword} 
-        username={username} 
-        password={password}
-      /> 
-  )
+  const addBlog = (blogObject) => {
+    // blogFormRef.current.toggleVisibility()
 
-  const showBlogs = () => (
-    <>
-      <h2>blogs</h2>
-      <span>
-        <p>{user} logged in</p>
+    // POST request & reset states
+    blogService
+      .create(blogObject)
+      .then(returnBlog => {
+        setBlogs(blogs.concat(returnBlog))
+        setLoginVisible(false)
+        setNotification({message: `Added new blog`, type: "sucess"})
+        setTimeout(() => {
+          setNotification({ message: null, type: null })
+        }, 5000)
+      })
+  }
+
+  const handleLikes = (id, blogObject) => {
+    blogService
+      .update(id, blogObject)
+      .then(returnBlog => {
+        setBlogs(blogs.map(blog => blog.id !== id ? blog : returnBlog))
+      })
+  }
+
+  const handleDelete = (id) => {
+    if (window.confirm("Do you want to delete this blog?")) {
+      blogService
+      .remove(id)
+      .then( () => {
+        setBlogs(blogs.filter(blog => blog.id !== id))
+      })
+    }
+  }
+
+
+  const loginForm = () => {
+    
+    return (
+      <div>
+        <Notification message={notification.message} type={notification.type} />
+        <Login 
+            handleLogin={handleLogin} 
+            setUsername={setUsername} 
+            setPassword={setPassword} 
+            username={username} 
+            password={password}
+          />     
+      </div>
+    )}
+
+  const showBlogs = () => {
+    const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
+    return (
+      <div>
+        <h2>blogs</h2>
+        <Notification message={notification.message} type={notification.type} />
+        <span>{user.name} logged in</span>
         <button onClick={handleLogout} type="button">logout</button>
-      </span>
-      
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )}
-    </>
-      
-  )
+
+        <h2>create new blog</h2>
+        <Togglable buttonLabel='new blog' ref={blogFormRef}>
+          <BlogForm
+            createBlog={addBlog}
+          />
+        </Togglable>
+          
+        <p/> 
+        {sortedBlogs.map(blog =>
+          <Blog key={blog.id} blog={blog} updateBlog={handleLikes} deleteBlog={handleDelete} user={user}/>
+        )}
+      </div>
+    )}
 
   return (
     <div>
