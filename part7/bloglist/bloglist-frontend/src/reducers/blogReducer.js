@@ -1,9 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import blogService from "../services/blogs";
 
+const initialState = [];
+
 const blogSlice = createSlice({
   name: "blogs",
-  initialState: [],
+  initialState,
   reducers: {
     addLike(state, action) {
       const id = action.payload;
@@ -36,17 +38,18 @@ export const initializeBlogs = () => {
   };
 };
 
-export const createBlog = (content) => {
+export const createBlog = (blogObject) => {
   return async (dispatch) => {
-    const newBlog = await blogService.create(content);
+    const newBlog = await blogService.create(blogObject);
     dispatch(appendBlog(newBlog));
   };
 };
 
-export const increaseLike = (id) => {
+export const increaseLike = (blog) => {
   return async (dispatch) => {
-    await blogService.update(id);
-    dispatch(addLike(id));
+    const blogObject = { ...blog, likes: blog.likes + 1 };
+    await blogService.update(blogObject.id, blogObject);
+    dispatch(addLike(blogObject.id));
   };
 };
 

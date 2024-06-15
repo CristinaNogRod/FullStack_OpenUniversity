@@ -1,26 +1,26 @@
 import { useRef } from "react";
-import Togglable from "./Togglable";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
-const Blog = ({ blog, updateBlog, deleteBlog }) => {
+import Togglable from "./Togglable";
+import { increaseLike, removeBlog } from "../reducers/blogReducer";
+
+const Blog = ({ blog }) => {
   const user = useSelector((state) => state.user);
+
+  const dispatch = useDispatch();
   const blogRef = useRef();
 
   const handleLikes = (event) => {
     event.preventDefault();
-    const blogObject = {
-      ...blog,
-      likes: blog.likes + 1,
-    };
-    updateBlog(blog.id, blogObject);
+    dispatch(increaseLike(blog));
   };
 
   const handleDelete = (event) => {
     event.preventDefault();
-    deleteBlog(blog.id);
+    if (window.confirm("Do you want to delete this blog?")) {
+      dispatch(removeBlog(blog.id));
+    }
   };
-
-  console.log();
 
   return (
     <div className="blog">
@@ -44,18 +44,13 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
   );
 };
 
-const BlogList = ({ sortedBlogs, updateBlog, deleteBlog }) => {
-  const user = useSelector((state) => state.user);
+const BlogList = () => {
+  const blogs = useSelector((state) => state.blogs);
+  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
   return (
     <div>
       {sortedBlogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          updateBlog={updateBlog}
-          deleteBlog={deleteBlog}
-          user={user}
-        />
+        <Blog key={blog.id} blog={blog} />
       ))}
     </div>
   );
