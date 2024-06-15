@@ -28,17 +28,13 @@ export const useNotificationValue = () => {
   return notificationAndDispatch[0]
 }
 
-export const useNotificationDispatch = () => {
-  const notificationAndDispatch = useContext(NotificationContext)
-  return notificationAndDispatch[1]
-}
-
-export const setNotification = (message) => {
-  const notificationDispatch = useNotificationDispatch()
-  return () => {
-    notificationDispatch({ type: 'SET_NOTIFICATION', payload: message })
+export const setNotification = () => {
+  const valueAndDispatch = useContext(NotificationContext)
+  const dispatch = valueAndDispatch[1]
+  return (message) => {
+    dispatch({ type: 'SET_NOTIFICATION', payload: message })
     setTimeout(() => {
-      notificationDispatch({ type: 'REMOVE_NOTIFICATION' })
+      dispatch({ type: 'REMOVE_NOTIFICATION' })
     }, 4000)
   }
 }
