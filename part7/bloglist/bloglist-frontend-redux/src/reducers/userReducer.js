@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import blogService from "../services/blogs";
-import loginService from "../services/login";
+import userService from "../services/users";
 
 const userSlice = createSlice({
   name: "user",
@@ -20,7 +20,7 @@ export const { setUser, removeUser } = userSlice.actions;
 export const loginUser = (username, password) => {
   return async (dispatch) => {
     try {
-      const user = await loginService.login({
+      const user = await userService.login({
         username,
         password,
       });
