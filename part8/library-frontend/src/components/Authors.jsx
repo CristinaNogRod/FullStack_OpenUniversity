@@ -3,7 +3,7 @@ import { ALL_AUTHORS } from "../queries";
 
 import AuthorsForm from "./AuthorsForm";
 
-const Authors = ({ setError }) => {
+const Authors = ({ setError, token }) => {
   const results = useQuery(ALL_AUTHORS);
 
   if (results.loading) {
@@ -22,8 +22,8 @@ const Authors = ({ setError }) => {
             <th>born</th>
             <th>books</th>
           </tr>
-          {authors.map((a) => (
-            <tr key={a.name}>
+          {authors.map((a, index) => (
+            <tr key={index}>
               <td>{a.name}</td>
               <td>{a.born}</td>
               <td>{a.bookCount}</td>
@@ -32,7 +32,7 @@ const Authors = ({ setError }) => {
         </tbody>
       </table>
 
-      <AuthorsForm setError={setError} />
+      {token ? <AuthorsForm setError={setError} /> : null}
     </div>
   );
 };

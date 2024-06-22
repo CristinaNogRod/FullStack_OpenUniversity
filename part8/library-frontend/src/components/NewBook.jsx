@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation } from "@apollo/client";
 
 import { ALL_BOOKS, ALL_AUTHORS, NEW_BOOK } from "../queries";
+import { updateCache } from "../App";
 
 const NewBook = ({ setError }) => {
   const [title, setTitle] = useState("");
@@ -11,21 +12,40 @@ const NewBook = ({ setError }) => {
   const [genres, setGenres] = useState([]);
 
   const [createBook] = useMutation(NEW_BOOK, {
-    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
+    // refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
     onError: (error) => {
       const message = error.graphQLErrors.map((e) => e.message).join("\n");
       setError(message);
+    },
+    update: (cache, response) => {
+      // cache.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => {
+      //   return {
+      //     allBooks: allBooks.concat(response.data.addBook),
+      //   };
+      // });
+      const addedBook = response.data.addBook;
+      updateCache(cache, { query: ALL_BOOKS }, addedBook);
+
+      cache.updateQuery({ query: ALL_AUTHORS }, ({ allAuthors }) => {
+        return {
+          allAuthors: allAuthors.concat(response.data.addBook.Author),
+        };
+      });
     },
   });
 
   const submit = async (event) => {
     event.preventDefault();
 
+    let genresFinal = [...genres];
     if (genre !== "") {
-      setGenres(genres.concat(genre));
+      genresFinal = genresFinal.concat(genre);
+      console.log("if", genresFinal);
     }
 
-    createBook({ variables: { title, author, published, genres } });
+    createBook({
+      variables: { title, author, published, genres: genresFinal },
+    });
 
     setTitle("");
     setPublished("");
