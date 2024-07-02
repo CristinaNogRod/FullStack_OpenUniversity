@@ -1,5 +1,11 @@
 import patientData from "../../data/patients.ts";
-import { Patient, NoSsnPatient, NewPatient } from "../types";
+import {
+  Patient,
+  NonSensitivePatient,
+  NewPatient,
+  EntryWithoutId,
+  Entry,
+} from "../types";
 import { v1 as uuid } from "uuid";
 import { toNewPatient } from "../utils/newPatientUtil.ts";
 
@@ -13,14 +19,21 @@ const getPatients = (): Patient[] => {
   return patients;
 };
 
-const getNoSsnPatients = (): NoSsnPatient[] => {
-  return patients.map(({ id, name, occupation, gender, dateOfBirth }) => ({
-    id,
-    name,
-    occupation,
-    gender,
-    dateOfBirth,
-  }));
+const getNonSensitivePatients = (): NonSensitivePatient[] => {
+  return patients.map(
+    ({ id, name, occupation, gender, dateOfBirth, entries }) => ({
+      id,
+      name,
+      occupation,
+      gender,
+      dateOfBirth,
+      entries,
+    })
+  );
+};
+
+const getPatientById = (id: string): Patient => {
+  return patients.find((patient) => patient.id === id) as Patient;
 };
 
 const addPatient = (patient: NewPatient): Patient => {
@@ -34,8 +47,25 @@ const addPatient = (patient: NewPatient): Patient => {
   return newPatient;
 };
 
+const addEntry = (entry: EntryWithoutId, patientId: string): Patient => {
+  const patient = patients.find((p) => p.id === patientId);
+  if (!patient) {
+    throw new Error(`Patient with id ${patientId} not found`);
+  }
+
+  const id = uuid();
+  const newEntry: Entry = {
+    id,
+    ...entry,
+  };
+  patient.entries = patient.entries.concat(newEntry);
+  return patient;
+};
+
 export default {
   getPatients,
-  getNoSsnPatients,
+  getNonSensitivePatients,
   addPatient,
+  getPatientById,
+  addEntry,
 };
